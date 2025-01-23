@@ -54,8 +54,12 @@ public class LinkedList {
 			throw new IllegalArgumentException(
 					"index must be between 0 and size");
 		}
+		Node iter = first;
 		//// Replace the following statement with your code
-		return null;
+		for(int i=0;i<index;i++) {
+			iter = iter.next;
+		}
+		return iter;
 	}
 	
 	/**
@@ -79,6 +83,19 @@ public class LinkedList {
 	 */
 	public void add(int index, MemoryBlock block) {
 		//// Write your code here
+		if(index == size) {last.next = new Node(block); last = last.next; }
+		else if(index == 0) {
+			Node second = first;
+			first = new Node(block);
+			first.next = second;
+		} else {
+			Node change = getNode(index);
+			Node temp = change.next;
+			change.next = new Node(block);
+			change.next.next = temp;
+		}
+
+
 	}
 
 	/**
@@ -90,6 +107,12 @@ public class LinkedList {
 	 */
 	public void addLast(MemoryBlock block) {
 		//// Write your code here
+		if (last == null) {
+			first = new Node(block);
+			last = new Node(block);
+		}
+		last.next = new Node(block); last = last.next;
+		size++;
 	}
 	
 	/**
@@ -101,6 +124,15 @@ public class LinkedList {
 	 */
 	public void addFirst(MemoryBlock block) {
 		//// Write your code here
+		if(first == null) {first = new Node(block); size++; }
+		else {
+		Node temp = first;
+		first = new Node(block); first.next = temp;
+		size ++;
+		if (last==null) {
+			last= first;
+		}
+	}
 	}
 
 	/**
@@ -114,7 +146,7 @@ public class LinkedList {
 	 */
 	public MemoryBlock getBlock(int index) {
 		//// Replace the following statement with your code
-		return null;
+		return getNode(index).block;
 	}	
 
 	/**
@@ -126,6 +158,13 @@ public class LinkedList {
 	 */
 	public int indexOf(MemoryBlock block) {
 		//// Replace the following statement with your code
+		Node iter = first;
+		int index = 0;
+		while(iter!=null) {
+			if(iter.block == block) return index; 
+			iter = iter.next;
+			index++;
+		}
 		return -1;
 	}
 
@@ -137,6 +176,23 @@ public class LinkedList {
 	 */
 	public void remove(Node node) {
 		//// Write your code here
+		if(node==null) return;
+		Node iter = first;
+		if(node==last) {
+		while (iter.next!=last) {
+			iter=iter.next;
+		}
+		iter.next=null;
+		size--;
+		}
+		if(node==first) { first.next=first; }
+		else {
+			while(iter!=null) {
+				if(iter.next==node){ node.next=iter.next.next; size--;
+				iter = iter.next;
+			}
+		} }
+	
 	}
 
 	/**
