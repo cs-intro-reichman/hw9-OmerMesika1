@@ -59,7 +59,27 @@ public class MemorySpace {
 	 */
 	public int malloc(int length) {		
 		//// Replace the following statement with your code
-		return -1;
+		int i=0;
+		Node iter = freeList.getFirst();
+		while(iter!=null) {
+			if(iter.block.length>=length) {
+				break;
+			}
+			i++;
+			iter=iter.next;
+		}
+			if(iter==null) return -1;
+			if(iter.block.length==length) {
+				allocatedList.addLast(new MemoryBlock(iter.block.baseAddress, length));
+				int ret = iter.block.baseAddress;
+				freeList.remove(iter);
+				return ret;
+			} else {
+				allocatedList.addLast(new MemoryBlock(iter.block.baseAddress, length));
+				freeList.remove(i);
+				freeList.add(i,new MemoryBlock(iter.block.baseAddress+length, iter.block.length-length));
+				return iter.block.baseAddress;
+			}
 	}
 
 	/**
@@ -72,6 +92,15 @@ public class MemorySpace {
 	 */
 	public void free(int address) {
 		//// Write your code here
+		if(allocatedList.getSize()==0) throw new IllegalArgumentException("index must be between 0 and size");
+		Node iter = allocatedList.getFirst();
+		while (iter!=null) {
+			if(iter.block.baseAddress==address) {
+				allocatedList.remove(iter);
+				freeList.addLast(iter.block);
+			}
+			iter = iter.next;
+		}
 	}
 	
 	/**
@@ -90,5 +119,38 @@ public class MemorySpace {
 	public void defrag() {
 		/// TODO: Implement defrag test
 		//// Write your code here
+		// if(freeList.getSize()<=1) return;
+		// Node iter = freeList.getFirst().next;
+		// if((freeList.getFirst().block.baseAddress+freeList.getFirst().block.length) == iter.block.baseAddress) {
+		// 	freeList.addtoFirst(0, iter.block.length);
+		// 	freeList.remove(iter);
+		// }
+		// Node second = freeList.getFirst();
+		// iter = iter.next;
+		// if(iter!=null) {
+		// while(iter!=null) {
+		// 	if((freeList.getFirst().block.baseAddress+freeList.getFirst().block.length) == iter.block.baseAddress) {
+		// 		freeList.addtoFirst(0, iter.block.length);
+		// 		freeList.remove(iter);
+		// 	}
+		// 	iter = iter.next;
+		// }
+		// }
+		boolean change = false;
+		Node check = freeList.getFirst();
+		for(int i=0;i<freeList.getSize();i++) {
+			Node runner = freeList.getFirst();
+			while (runner!=null) {
+				if((check.block.baseAddress+check.block.length)==runner.block.baseAddress) {
+					check.block.length += runner.block.length;
+					freeList.remove(runner);
+					change = true;
+				}
+				runner = runner.next;
+			}
+			if(!change) { check = check.next; }
+			else {check = freeList.getFirst(); }
+
+		}
 	}
 }

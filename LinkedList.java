@@ -15,7 +15,6 @@ public class LinkedList {
 		last = first;
 		size = 0;
 	}
-	
 	/**
 	 * Gets the first node of the list
 	 * @return The first node of the list.
@@ -83,20 +82,19 @@ public class LinkedList {
 	 */
 	public void add(int index, MemoryBlock block) {
 		//// Write your code here
-		if(index == size) {last.next = new Node(block); last = last.next; }
-		else if(index == 0) {
-			Node second = first;
-			first = new Node(block);
-			first.next = second;
-		} else {
-			Node change = getNode(index);
-			Node temp = change.next;
-			change.next = new Node(block);
-			change.next.next = temp;
+		if (index < 0 || index > size) {
+			throw new IllegalArgumentException(
+					"index must be between 0 and size");
+		} 
+		if(index==0) { addFirst(block); return; }
+		if(index==size) {addLast(block); return; }
+			Node temp = getNode(index-1);
+			Node change = temp.next;
+			temp.next = new Node(block);
+			temp.next.next = change;
+			size++;
 		}
-
-
-	}
+	
 
 	/**
 	 * Creates a new node that points to the given memory block, and adds it
@@ -111,7 +109,8 @@ public class LinkedList {
 			first = new Node(block);
 			last = new Node(block);
 		}
-		last.next = new Node(block); last = last.next;
+		if(size==1) {first.next=new Node(block);last = first.next;} else {
+		last.next = new Node(block); last = last.next; }
 		size++;
 	}
 	
@@ -124,7 +123,10 @@ public class LinkedList {
 	 */
 	public void addFirst(MemoryBlock block) {
 		//// Write your code here
-		if(first == null) {first = new Node(block); size++; }
+		if(first == null) {first = new Node(block);
+			last=first;
+			size++;
+		}
 		else {
 		Node temp = first;
 		first = new Node(block); first.next = temp;
@@ -146,6 +148,10 @@ public class LinkedList {
 	 */
 	public MemoryBlock getBlock(int index) {
 		//// Replace the following statement with your code
+		if (index < 0 || index > size || size==0) {
+			throw new IllegalArgumentException(
+					"index must be between 0 and size");
+		}
 		return getNode(index).block;
 	}	
 
@@ -176,24 +182,37 @@ public class LinkedList {
 	 */
 	public void remove(Node node) {
 		//// Write your code here
-		if(node==null) return;
+		if(node==null)     throw new NullPointerException("ERROR NullPointerException!");
+		if(node==first) { 
+			if(first.next==null) {
+				first=null;
+				last = null;
+				size--;
+				return;
+			}
+			first = first.next;			
+			size--;
+			return;
+		}
 		Node iter = first;
 		if(node==last) {
 		while (iter.next!=last) {
 			iter=iter.next;
 		}
 		iter.next=null;
+		last = iter;
 		size--;
+		return;
 		}
-		if(node==first) { first.next=first; }
+		if(node==first) { first.next=first; size--; return; }
 		else {
 			while(iter!=null) {
-				if(iter.next==node){ node.next=iter.next.next; size--;
+				if(iter.next==node){ iter.next=iter.next.next; size--; }
 				iter = iter.next;
 			}
 		} }
 	
-	}
+	
 
 	/**
 	 * Removes from this list the node which is located at the given index.
@@ -204,6 +223,7 @@ public class LinkedList {
 	 */
 	public void remove(int index) {
 		//// Write your code here
+		remove(getNode(index));
 	}
 
 	/**
@@ -215,6 +235,32 @@ public class LinkedList {
 	 */
 	public void remove(MemoryBlock block) {
 		//// Write your code here
+		int prevsize = size;
+		if (block==null) {
+			throw new IllegalArgumentException("index must be between 0 and size");
+		}
+		if(first==null || last==null) {return;}
+		if(block == first.block) {
+			if(first==last) {
+				first=first.next;
+				last = null;
+			} else{
+				first=first.next;
+			}
+			size--;
+			return;
+		}
+		Node iter = first;
+		while ( iter.next!=null && iter.next.block!=block) {
+			iter=iter.next;
+		}
+		if(iter.next!=null) {
+			if(iter.next==last) { last=iter; iter.next=null; size--; return; }
+		iter.next=iter.next.next;
+		size--; 
+		}
+		if(size==prevsize) throw new IllegalArgumentException("index must be between 0 and size");
+
 	}	
 
 	/**
@@ -229,6 +275,13 @@ public class LinkedList {
 	 */
 	public String toString() {
 		//// Replace the following statement with your code
-		return "";
+		Node iter1 = first;
+		if(iter1==null) return "";
+		String temp =iter1.toString();
+		while(iter1.next!=null) {
+			iter1=iter1.next;
+			temp+=iter1.toString();
+		}
+		return temp;
 	}
 }
